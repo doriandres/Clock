@@ -1,14 +1,78 @@
-var Clock =  function(config){
+var Clock =  function(config, x, y){
   'use strict';
   var clock = this;
-  clock.hrs = config.data.hrs;
-  clock.min = config.data.min;
-  clock.sec = config.data.sec;
+  clock.id = document.getElementsByClassName('clock').length;
+  clock.hrs = config.hrs;
+  clock.min = config.min;
+  clock.sec = config.sec;
   clock.paused = false;
   clock.interval;
-  clock.secElm = document.getElementById(config.views.sec);
-  clock.minElm = document.getElementById(config.views.min);
-  clock.hrsElm = document.getElementById(config.views.hrs);
+  clock.createClock(x, y);
+  clock.start();
+}
+//Clock creator
+Clock.prototype.createClock = function(x, y){
+  var clockContainer = document.createElement("div");
+  clockContainer.setAttribute("class", "clock");
+  clockContainer.setAttribute("id", "clock_"+this.id);
+  clockContainer.setAttribute("style","position: absolute; left:"+x+"px; top:"+y+"px;");
+  var h1 = document.createElement("h1");
+  this.secElm = document.createElement("span");
+  this.secElm.setAttribute('class', 'sec');
+  this.secElm.textContent = '00';
+  this.minElm = document.createElement("span");
+  this.minElm.setAttribute('class', 'min');
+  this.minElm.textContent = '00';
+  this.hrsElm = document.createElement("span");
+  this.hrsElm.setAttribute('class', 'hrs');
+  this.hrsElm.textContent = '00';
+  h1.appendChild(this.hrsElm);
+  h1.appendChild(document.createTextNode(" : "));
+  h1.appendChild(this.minElm);
+  h1.appendChild(document.createTextNode(" : "));
+  h1.appendChild(this.secElm);
+  clockContainer.appendChild(h1);
+  var label = document.createTextNode("Resume");
+  this.resumeBtn = document.createElement("button");
+  this.resumeBtn.setAttribute('type', 'button');
+  this.resumeBtn.setAttribute('class', 'resumeBtn');
+  this.resumeBtn.appendChild(label);
+  clockContainer.appendChild(this.resumeBtn);
+  label = document.createTextNode("Pause");
+  this.pauseBtn = document.createElement("button");
+  this.pauseBtn.setAttribute('type', 'button');
+  this.pauseBtn.setAttribute('class', 'pauseBtn');
+  this.pauseBtn.appendChild(label);
+  clockContainer.appendChild(this.pauseBtn);
+  label = document.createTextNode("Restart");
+  this.restartBtn = document.createElement("button");
+  this.restartBtn.setAttribute('type', 'button');
+  this.restartBtn.setAttribute('class', 'restartBtn');
+  this.restartBtn.appendChild(label);
+  clockContainer.appendChild(this.restartBtn);
+
+  document.body.appendChild(clockContainer);
+
+  var clock = this;
+  this.resumeBtn.addEventListener("click", function(){
+    clock.resume();
+    if (clock.paused == false){
+      clock.resumeBtn.disabled = true;
+      clock.pauseBtn.disabled = false;
+    }
+  });
+  this.pauseBtn.addEventListener("click", function(){
+    clock.pause();
+    if (clock.paused){ //disable the pause btn if clock.pause(); worked
+      clock.resumeBtn.disabled = false;
+      clock.pauseBtn.disabled = true;
+    }
+  });
+  this.restartBtn.addEventListener("click", function(){
+    clock.restart();
+    clock.resumeBtn.disabled = true;
+    clock.pauseBtn.disabled = false;
+  });
 }
 //Data handlers
 Clock.prototype.addSecond = function(){
